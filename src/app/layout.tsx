@@ -3,7 +3,7 @@ import { Geist_Mono } from "next/font/google";
 
 import { siteConfig } from "@/config/site";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 import "./globals.css";
@@ -35,10 +35,15 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: siteConfig.themeColor,
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+      <body className="px-safe pt-safe pb-safe flex min-h-dvh flex-col">
         {children}
         <Analytics />
       </body>
