@@ -1,6 +1,8 @@
 import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { env } from "@/lib/env";
+
 import type { Metadata } from "next";
 
 import "./globals.css";
@@ -15,7 +17,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteUrl = env.NEXT_PUBLIC_SITE_URL;
 const siteName = "";
 const siteDescription = "";
 
