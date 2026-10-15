@@ -1,10 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-/**
- * Supabase client for use in Server Components, Route Handlers, and Server Actions.
- * Usage: const supabase = await createClient();
- */
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -22,8 +18,7 @@ export async function createClient() {
               cookieStore.set(name, value, options),
             );
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing sessions.
+            // Server Component에서 호출되면 쿠키를 쓸 수 없다. 세션 갱신은 updateSession()이 맡는다.
           }
         },
       },
