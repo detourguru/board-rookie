@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Geist_Mono } from "next/font/google";
 
 import { siteConfig } from "@/config/site";
+import { createMetadata } from "@/lib/metadata";
 
 import type { Metadata, Viewport } from "next";
 
@@ -14,24 +15,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  ...createMetadata({
+    title: siteConfig.name,
+    description: siteConfig.description,
+    path: "/",
+  }),
   metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-  openGraph: {
-    title: siteConfig.name,
-    description: siteConfig.description,
-    url: "/",
-    siteName: siteConfig.name,
-    locale: siteConfig.locale,
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
   },
 };
 
