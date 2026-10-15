@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
+import { track } from "@/lib/analytics";
 import { env } from "@/lib/env";
 import {
   initKakao,
@@ -37,6 +38,7 @@ export function ShareButtons({
   );
 
   const handleKakao = () => {
+    track("share_click", { method: "kakao" });
     try {
       shareKakao(url);
     } catch {
@@ -45,6 +47,7 @@ export function ShareButtons({
   };
 
   const handleCopy = async () => {
+    track("share_click", { method: "copy" });
     try {
       await copyText(url);
       toast.success("링크를 복사했습니다.");
@@ -54,6 +57,7 @@ export function ShareButtons({
   };
 
   const handleNativeShare = async () => {
+    track("share_click", { method: "native" });
     try {
       await nativeShare({ title, text, url });
     } catch {

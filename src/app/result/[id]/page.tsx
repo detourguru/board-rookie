@@ -4,6 +4,7 @@ import { ShareButtons } from "@/components/share-buttons";
 import { createMetadata } from "@/lib/metadata";
 
 import { getResult, results } from "./results";
+import { TrackResultView } from "./track-result-view";
 
 import type { Metadata } from "next";
 
@@ -42,6 +43,7 @@ export default async function ResultPage({
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
+      <TrackResultView resultId={id} />
       <p className="text-muted-foreground text-sm">나의 결과는</p>
       <h1 className="text-3xl font-bold">{result.title}</h1>
       <p>{result.description}</p>
