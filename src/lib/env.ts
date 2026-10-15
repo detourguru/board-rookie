@@ -30,6 +30,7 @@ export const env = parseEnv(
     NEXT_PUBLIC_SITE_URL: z._default(z.url(), "http://localhost:3000"),
     NEXT_PUBLIC_SUPABASE_URL: z.optional(z.url()),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: z.optional(z.string()),
+    NEXT_PUBLIC_KAKAO_JS_KEY: z.optional(z.string()),
   }),
   {
     NEXT_PUBLIC_SITE_URL:
@@ -37,6 +38,7 @@ export const env = parseEnv(
       (vercelProductionUrl ? `https://${vercelProductionUrl}` : undefined),
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    NEXT_PUBLIC_KAKAO_JS_KEY: process.env.NEXT_PUBLIC_KAKAO_JS_KEY,
   },
 );
 

@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import { Geist_Mono } from "next/font/google";
 
+import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
 import { createMetadata } from "@/lib/metadata";
 
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ko" className={`${geistMono.variable} h-full antialiased`}>
       <body className="px-safe pt-safe pb-safe flex min-h-dvh flex-col">
         {children}
+        <Toaster position="top-center" />
         <Analytics />
       </body>
     </html>

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ShareButtons } from "@/components/share-buttons";
 import { createMetadata } from "@/lib/metadata";
 
 import { getResult, results } from "./results";
@@ -44,6 +45,13 @@ export default async function ResultPage({
       <p className="text-muted-foreground text-sm">나의 결과는</p>
       <h1 className="text-3xl font-bold">{result.title}</h1>
       <p>{result.description}</p>
+      <div className="mt-6 w-full max-w-xs">
+        <ShareButtons
+          path={`/result/${id}`}
+          title={result.title}
+          text={result.description}
+        />
+      </div>
     </main>
   );
 }
