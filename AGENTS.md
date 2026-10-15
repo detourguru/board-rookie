@@ -45,12 +45,13 @@ PR, 이슈, 커밋 메시지, 일감 댓글, 리뷰 코멘트, 코드 주석, �
 
 # 프로젝트 규칙
 
-웹토이를 빠르게 만들기 위한 보일러플레이트다.
+BoardRookie는 보드게임 카페 입문자가 게임을 고르고 규칙을 익혀 첫 판을 시작하도록 돕는 모바일 우선 웹앱이다. 기능을 구현하기 전에 `docs/PRODUCT_SPEC.md`를 읽는다.
 
 ## 구조
 
-- `src/config/site.ts`: 서비스 이름, 설명, 테마 색. 새 웹토이는 이 파일부터 채운다.
-- `src/app`: 라우트. 결과 페이지 예시는 `src/app/result/[id]`에 있다.
+- `docs/PRODUCT_SPEC.md`: 제품 기준 문서. MVP 범위를 판단하는 기준이다.
+- `src/config/site.ts`: 서비스 이름, 설명, 테마 색.
+- `src/app`: 라우트.
 - `src/components/ui`: shadcn/ui 컴포넌트.
 - `src/components`: 여러 페이지에서 쓰는 컴포넌트.
 - `src/lib`: 공용 유틸.
@@ -60,6 +61,7 @@ PR, 이슈, 커밋 메시지, 일감 댓글, 리뷰 코멘트, 코드 주석, �
   - `analytics.ts`: 이벤트 추적
 - `src/lib/supabase`: Supabase 클라이언트.
 - `supabase/`: Supabase CLI 설정과 마이그레이션.
+- `tests/e2e`: Playwright E2E 테스트. 단위 테스트는 대상 파일 옆에 `*.test.ts`로 둔다.
 
 ## 코드 작성
 
@@ -78,5 +80,315 @@ PR, 이슈, 커밋 메시지, 일감 댓글, 리뷰 코멘트, 코드 주석, �
 
 ## 완료 전 확인
 
-- `npm run check`(lint, format:check, typecheck)를 통과해야 한다.
+- `npm run check`(lint, format:check, typecheck, 단위 테스트)를 통과해야 한다.
 - 라우트나 메타데이터를 바꿨으면 `npm run build`도 돌린다.
+- 사용자 흐름을 바꿨으면 `npm run test:e2e`도 돌린다.
+
+# Product and Engineering Rules
+
+## 1. Project Context
+
+BoardRookie is a mobile-first web app for board-game beginners visiting board-game cafes.
+
+Its purpose is to help users:
+
+- Find games suitable for their group size, available time, experience, and preferred atmosphere.
+- Understand why a game is recommended.
+- Learn the essential rules in a clear, step-by-step format.
+- Start playing without struggling through a long or confusing rulebook.
+
+The product's primary value is helping beginners move from game discovery to starting their first game. Do not turn the project into a generic board-game database or an AI chatbot.
+
+## 2. Priorities
+
+When making product and engineering decisions, prioritize in this order:
+
+1. Correctness of game information and rules.
+2. Clear beginner-friendly UX.
+3. Mobile usability.
+4. SEO for useful public pages.
+5. Automated quality checks and reliable deployment.
+6. Analytics that help validate the product.
+7. Optional AI features.
+
+Do not sacrifice correctness or usability to add more features.
+
+## 3. Development Principles
+
+- Inspect the existing codebase before changing files.
+- Follow established project conventions unless there is a clear reason to change them.
+- Prefer simple, readable, maintainable implementations.
+- Avoid unnecessary abstractions and premature generalization.
+- Do not add dependencies when the existing stack can solve the problem adequately.
+- Do not implement out-of-scope features without a clear product requirement.
+- Keep changes focused and explain meaningful architectural decisions.
+- Never claim a feature or test works without verifying it.
+
+## 4. Technology and Architecture
+
+### Stack
+
+- Next.js 16 App Router, React 19, TypeScript strict mode
+- Tailwind CSS v4 with shadcn/ui components
+- Vitest for unit tests, Playwright for E2E tests
+- Supabase for dynamic data such as feedback, introduced only when a feature needs it
+- Analytics through `track()` in `src/lib/analytics.ts`. The provider will move from Vercel Analytics to PostHog.
+
+### Next.js
+
+- Prefer Server Components by default.
+- Keep client component boundaries as small as practical.
+- Use server rendering or static generation appropriately for public game pages.
+- Use the Metadata API for page-specific SEO metadata.
+- Generate metadata from validated game data rather than duplicating values.
+- Implement `sitemap.ts` and `robots.ts` as appropriate.
+- Use canonical URLs consistently.
+- Add Open Graph metadata and an appropriate sharing image strategy.
+- Use structured data only when it accurately represents the page content.
+
+Do not use `useEffect` to reproduce functionality that can be handled more simply through server rendering, URL state, or ordinary event handlers.
+
+### TypeScript
+
+- Keep strict type checking enabled.
+- Avoid `any`; prefer explicit types, discriminated unions, and `unknown` where appropriate.
+- Validate external data before trusting it.
+- Keep domain types separate from UI-specific presentation types when doing so improves clarity.
+- Avoid unsafe type assertions without a documented reason.
+
+### Component Design
+
+- Keep components focused on a clear responsibility.
+- Separate recommendation logic from presentation.
+- Separate rule content from rule rendering.
+- Extract reusable components when there is genuine reuse.
+- Avoid building a large design system before the product needs one.
+- Ensure all interactive elements have clear labels, focus states, and appropriate keyboard behavior.
+
+## 5. Domain and Data Rules
+
+### Game Data
+
+Game information is product-critical.
+
+- Never invent player counts, playing times, age recommendations, or rules.
+- Record sources and verification dates for important factual data.
+- Distinguish official playing time from estimated teaching time.
+- Distinguish verified information from estimates.
+- Do not claim that a game is available at a specific cafe unless that information has been verified.
+- Handle missing data explicitly.
+- Do not silently substitute fabricated defaults for unknown values.
+- Use a consistent slug for each game's public URL.
+
+### Rules Content
+
+Rules must be understandable to beginners.
+
+Use a consistent content structure where appropriate:
+
+- Game objective
+- Setup
+- Turn sequence
+- Available actions
+- Scoring and end conditions
+- Common beginner mistakes
+
+Write original explanatory text based on appropriately sourced information.
+
+Do not copy entire rulebooks or reproduce protected images without permission.
+
+When rule details differ by edition, record the relevant edition and make the limitation clear.
+
+AI-generated rule explanations must not be treated as verified facts without review.
+
+### Initial Data Source
+
+Prefer a small, curated catalog (about 10 games at launch, growing to 15 to 30) over a large, unreliable dataset.
+
+Keep initial public catalog data static and version-controlled unless there is a concrete reason to introduce a database.
+
+## 6. Filtering and Recommendation Logic
+
+Keep filtering and recommendation logic deterministic in the initial MVP.
+
+- A game must satisfy the applicable player-count constraints.
+- A game must satisfy the selected duration constraint according to the documented filtering policy.
+- Beginner suitability must use explicit, documented criteria.
+- Mood and genre preferences should influence ranking only when the corresponding data is available.
+- Missing data must not silently qualify a game as a match.
+- Empty results must produce a useful message and allow users to relax constraints.
+- Recommendation reasons must correspond to actual game data and applied criteria.
+
+Document any assumptions used to compare duration ranges or recommended player counts.
+
+Do not call an LLM for ordinary filtering or deterministic calculations.
+
+## 7. URL and SEO Rules
+
+- Public game pages must have stable, readable URLs.
+- Filter state should be represented in URL search parameters where appropriate.
+- Refreshing or sharing a filtered URL should preserve the intended state.
+- Parse and validate query parameters.
+- Do not generate duplicate metadata across different game pages.
+- Ensure titles and descriptions accurately describe the page.
+- Use absolute canonical and Open Graph URLs derived from `siteConfig.url`.
+- Do not expose staging or preview URLs as production canonicals.
+- Do not index every possible filter combination automatically.
+- Include only appropriate public URLs in the sitemap.
+- Avoid adding structured data that does not match visible page content.
+
+SEO implementation does not guarantee indexing or search rankings.
+
+## 8. Accessibility and Responsive UX
+
+The primary environment is a smartphone used inside a board-game cafe.
+
+- Make primary actions easy to tap.
+- Use semantic HTML.
+- Provide visible keyboard focus.
+- Support keyboard navigation.
+- Associate form controls with labels.
+- Do not communicate selected states through color alone.
+- Use appropriate contrast and readable text sizes.
+- Avoid unnecessary animations.
+- Ensure rule sections are easy to navigate while playing.
+- Provide useful loading, empty, error, and unavailable-data states.
+- Use progressive enhancement where practical.
+
+## 9. Analytics and Privacy
+
+Analytics should measure the product funnel, not collect unnecessary personal information.
+
+Core events include:
+
+- `landing_view`
+- `filter_applied`
+- `game_detail_viewed`
+- `rules_started`
+- `rules_section_viewed`
+- `game_started_feedback`
+- `feedback_submitted`
+
+Additional events may be introduced when there is a specific product question to answer.
+
+- Use consistent event names and documented properties.
+- Avoid firing duplicate events during rerenders.
+- Do not include sensitive personal information in event properties.
+- Do not send secrets or private user content to analytics.
+- Follow the analytics provider's consent and privacy requirements.
+- Keep analytics optional when its configuration is missing.
+- Never fabricate analytics data or claim that a conversion occurred without evidence.
+- Prefer simple descriptive events over collecting every possible interaction.
+
+## 10. Testing Requirements
+
+Testing is part of feature development, not a final cleanup task.
+
+### Unit Tests
+
+Add or update tests for meaningful domain logic, including:
+
+- Player-count filtering
+- Duration filtering
+- Beginner suitability
+- Recommendation ranking
+- Empty results
+- Invalid query parameters
+- Missing game data
+- Rule content transformations
+
+Tests should be deterministic and independent of external APIs.
+
+### Playwright E2E
+
+Cover the primary user journey:
+
+1. Open the home page.
+2. Select group conditions.
+3. View matching recommendations.
+4. Open a game detail page.
+5. Navigate to its rules.
+6. View a rule section.
+7. Submit feedback if that feature is implemented.
+8. Refresh or revisit a shared filtered URL and verify its state.
+
+Also test important empty and error states.
+
+Prefer accessible selectors such as roles and labels over brittle CSS selectors.
+
+Do not make E2E tests depend on live third-party APIs.
+
+### CI
+
+GitHub Actions runs lint, format check, typecheck, unit tests, production build, and Playwright E2E on every pull request and on pushes to `main`.
+
+A feature is not complete when it only works locally; the relevant automated checks must pass.
+
+If a check cannot be run, clearly report why instead of claiming success.
+
+## 11. Security and Configuration
+
+- Never commit secrets, access tokens, or private keys.
+- Keep `.env.example` limited to required variable names and safe placeholders.
+- Keep server-only credentials out of client components and public bundles.
+- Use server-side authorization for protected operations.
+- Do not rely on client-side checks as the only access control.
+- Validate user-submitted feedback.
+- Add reasonable protections against spam and abuse where necessary.
+- Do not introduce authentication without a product requirement.
+
+## 12. Optional AI Features
+
+AI functionality is not required for the initial MVP.
+
+If AI is introduced later:
+
+- Use verified game-rule content as the grounding source.
+- Make it clear when an answer may be uncertain.
+- Do not present unsupported rule interpretations as authoritative.
+- Stream responses only when streaming improves the user experience.
+- Handle cancellation, errors, timeouts, and rate limits.
+- Enforce usage limits on the server.
+- Never expose API keys in client code.
+- Add tests for failure states.
+- Keep deterministic rule navigation available when AI is unavailable.
+
+Do not introduce subscriptions or payment flows solely to increase technical complexity.
+
+## 13. Git and Change Management
+
+- Make small, focused changes.
+- Work on a feature branch and merge into `main` through a pull request.
+- Keep generated files and temporary debugging artifacts out of commits unless required.
+- Do not overwrite unrelated user changes.
+- Do not modify dependencies or project configuration without a reason.
+- Update relevant documentation when behavior, architecture, or setup changes.
+- Keep `README.md` consistent with the actual implementation.
+- Update `docs/PRODUCT_SPEC.md` when a product decision materially changes.
+
+## 14. Definition of Done
+
+A task is complete when:
+
+- The requested behavior is implemented.
+- The UI works on mobile and desktop as applicable.
+- Loading, empty, and error states are handled.
+- Accessibility basics are satisfied.
+- SEO metadata is correct for affected public pages.
+- Relevant tests are added or updated.
+- Lint, typecheck, tests, and build pass where applicable.
+- Documentation reflects the actual behavior.
+- No unsupported factual claims or fabricated game data are introduced.
+
+## 15. How to Approach a New Task
+
+1. Read the relevant product specification.
+2. Inspect the existing implementation and identify affected files.
+3. Confirm the expected behavior and edge cases.
+4. Implement the smallest coherent solution.
+5. Add or update tests.
+6. Run the relevant quality checks.
+7. Review accessibility, SEO, and responsive behavior where relevant.
+8. Summarize changes, test results, limitations, and follow-up work.
+
+If a requirement is ambiguous, prefer the smallest implementation consistent with the product specification. Ask for clarification when the ambiguity could materially change the architecture, data integrity, or user experience.

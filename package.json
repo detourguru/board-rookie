@@ -1,5 +1,5 @@
 {
-  "name": "webtoy-boilerplate",
+  "name": "board-rookie",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,10 @@
     "lint:fix": "eslint . --fix",
     "db:types": "supabase gen types typescript --linked > src/types/database.types.ts && prettier --write src/types/database.types.ts",
     "typecheck": "next typegen && tsc --noEmit",
-    "check": "npm run lint && npm run format:check && npm run typecheck"
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
@@ -34,6 +37,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22",
     "@types/react": "^19",
@@ -45,7 +49,8 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "supabase": "^2.121.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.4"
   },
   "engines": {
     "node": "22.x"
